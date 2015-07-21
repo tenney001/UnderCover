@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+
+    <div class="container">
+      <p>游戏规则：</p>
+      <ol>
+        <li>每轮每个玩家只允许说一句话描述自己的身份词，既不能让卧底发现，也要给同伴暗示</li>
+        <li>玩家发言完毕后开始投票，获票超过50%的玩家出局</li>
+        <li>活着的平民小于等于2时，卧底胜利。反之平民胜利</li>
+      </ol>
+
+      <h2>输入你的昵称，开始游戏吧~</h2>
+
+      <form action="/doLogin" method="post">
+        <label>昵称：</label><input name="nickName" type="text" />
+        <input type="submit" value="进入"/><br/>
+      </form>
+    </div>
+  </body>
+</html>
