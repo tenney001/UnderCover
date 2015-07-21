@@ -16,6 +16,12 @@
     <script src="/javascripts/jquery-1.11.1.js"></script>
   </head>
   <body>
+      <ul>
+        <% for(var i in data) { %>
+          <li>userID:<%= data[i]._id%>  , email:<%= data[i].email %> , username:<%= data[i].username %></li>
+        <% } %>
+
+      </ul>
       <ul id="messages"></ul>
       <form action="">
         <input id="m" autocomplete="off" autofocus="true" /><button>发射</button>

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var room = require('../Model/Room');
+var config = require('../config');
 var roomList = [];
 
 
@@ -11,10 +12,19 @@ router.get('/', function(req, res, next) {
 
 /* POST doLogin. */
 router.post('/doLogin',function(req,res,next){
-  var nickName = req.body.nickName;
-  console.log(req.session);
-  req.session.nickName = nickName;
-  res.render('room',{title:'游戏房间',nickName:nickName});
+  var db = config.getDB();
+  var usercollection = db.get('usercollection');
+  usercollection.find({},{},function(err,data){
+    if(err){
+      console.log(err);
+      res.end();
+    }
+    var nickName = req.body.nickName;
+    console.log(req.session);
+    req.session.nickName = nickName;
+    console.info(data)
+    res.render('room',{title:'游戏房间',nickName:nickName,data:data});
+  })
 });
 
 

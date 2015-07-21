@@ -14,7 +14,7 @@ var Room = function(user){
 }
 
 Room.prototype.Start = function(){
-    
+
 }
 
 
