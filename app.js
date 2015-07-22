@@ -23,15 +23,19 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
   secret: '12345',
-  name: 'testapp',   //ÕâÀïµÄnameÖµµÃÊÇcookieµÄname£¬Ä¬ÈÏcookieµÄnameÊÇ£ºconnect.sid
-  cookie: {maxAge: 80000 },  //ÉèÖÃmaxAgeÊÇ80000ms£¬¼´80sºósessionºÍÏàÓ¦µÄcookieÊ§Ğ§¹ıÆÚ
+  name: 'testapp',   //ï¿½ï¿½ï¿½ï¿½ï¿½nameÖµï¿½ï¿½ï¿½ï¿½cookieï¿½ï¿½nameï¿½ï¿½Ä¬ï¿½ï¿½cookieï¿½ï¿½nameï¿½Ç£ï¿½connect.sid
+  cookie: {maxAge: 80000 },  //ï¿½ï¿½ï¿½ï¿½maxAgeï¿½ï¿½80000msï¿½ï¿½ï¿½ï¿½80sï¿½ï¿½sessionï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½cookieÊ§Ğ§ï¿½ï¿½ï¿½ï¿½
   resave: false,
   saveUninitialized: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/doLogin', routes);
+app.use('/about', routes);
+app.use('/news', routes);
+app.use('/contact', routes);
+app.use('/login', routes);
+app.use('/register', routes);
 app.use('/users', users);
 
 // catch 404 and forward to error handler

@@ -1,27 +1,103 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+<head>
 
-    <div class="container">
-      <p>游戏规则：</p>
-      <ol>
-        <li>每轮每个玩家只允许说一句话描述自己的身份词，既不能让卧底发现，也要给同伴暗示</li>
-        <li>玩家发言完毕后开始投票，获票超过50%的玩家出局</li>
-        <li>活着的平民小于等于2时，卧底胜利。反之平民胜利</li>
-      </ol>
+  <% include ./inc/head.ejs %>
 
-      <h2>输入你的昵称，开始游戏吧~</h2>
+</head>
+<body class="show-nav nav-center home-page yo-anim-enabled">
 
-      <form action="/doLogin" method="post">
-        <label>昵称：</label><input name="nickName" type="text" />
-        <input type="submit" value="进入"/><br/>
-      </form>
+<!--content-->
+<% include ./inc/main-nav.ejs %>
+<% include ./inc/mobile-nav.ejs %>
+
+
+<header id="home" class="main-section home hidden-xs">
+  <div class="home-fullscreen">
+    <div class="container-fluid">
+      <div class="basic-info ">
+        <div class="clearfix"></div>
+        <div class="open-daily yo-anim yo-anim-fade-ltr" data-animation-delay="200">
+          <span class="day">Monday - Thursday</span>
+          <span class="hours">7.00 - 21.00</span>
+        </div>
+        <div class="open-daily yo-anim yo-anim-fade-ltr" data-animation-delay="500">
+          <span class="day">Friday - Sunday</span>
+          <span class="hours">7.00 - 23.00</span>
+        </div>
+        <div class="simple-contact yo-anim yo-anim-fade-ltr" data-animation-delay="800">
+          <span class="address">Contact : Tenney</span>
+          <span class="postal-code">QQ:270078781</span>
+        </div>
+        <div class="simple-contact yo-anim yo-anim-fade-ltr" data-animation-delay="1100">
+          <span class="mobile"><a href="#">+13888888888</a></span>
+          <span class="email"><a href="#">270078781@qq.com</a></span>
+        </div>
+
+      </div>
     </div>
-  </body>
+    <div class="home-parallax opacity-50">
+      <div data-parallaxify-range="100" class="parallax-layer" style="background-image: url(/img/bg2.jpg); "></div>
+    </div>
+  </div>
+</header>
+<div class="visible-xs mobile-basic-info">
+  <div id="footer-spacer"></div>
+  <footer id="footer" class="text-center">
+
+    <a href="#" class="to-the-top">
+      <i class="fa fa-arrow-circle-o-up"></i>
+    </a>
+
+    <h2>Berg restaurant</h2>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2 text-center v-card">
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="open-daily">
+              <span class="day">Monday - Thursday</span>
+              <span class="hours">7.00 - 21.00</span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="open-daily">
+              <span class="day">Friday - Sunday</span>
+              <span class="hours">7.00 - 23.00</span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="simple-contact">
+              <span class="address">Contact : Tenney</span>
+              <span class="postal-code">QQ:270078781</span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="simple-contact">
+              <span class="mobile"><a href="#">+13888888888</a></span>
+              <span class="email"><a href="#">270078781@qq.com</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <div class="home-bg-image"></div>
+</div>
+
+
+<div class="gallery-wrapper"></div>
+
+<div id="preloader">
+  <div id="status">
+    <div class="loading-wrapper">
+      <img src="/img/logo2.png" alt="Loading"/>
+    </div>
+  </div>
+  <div id="status-loaded"></div>
+</div>
+
+<% include ./inc/script.ejs %>
+
+</body>
 </html>
