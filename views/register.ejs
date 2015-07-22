@@ -12,35 +12,16 @@
 <% include ./inc/mobile-nav.ejs %>
 
 
-<header id="home" class="main-section home hidden-xs">
-  <div class="home-fullscreen">
-    <div class="container-fluid">
-      <div class="basic-info ">
-        <div class="clearfix"></div>
-        <div class="open-daily yo-anim yo-anim-fade-ltr" data-animation-delay="200">
-          <span class="day">Monday - Thursday</span>
-          <span class="hours">7.00 - 21.00</span>
-        </div>
-        <div class="open-daily yo-anim yo-anim-fade-ltr" data-animation-delay="500">
-          <span class="day">Friday - Sunday</span>
-          <span class="hours">7.00 - 23.00</span>
-        </div>
-        <div class="simple-contact yo-anim yo-anim-fade-ltr" data-animation-delay="800">
-          <span class="address">Contact : Tenney</span>
-          <span class="postal-code">QQ:270078781</span>
-        </div>
-        <div class="simple-contact yo-anim yo-anim-fade-ltr" data-animation-delay="1100">
-          <span class="mobile"><a href="#">+13888888888</a></span>
-          <span class="email"><a href="#">270078781@qq.com</a></span>
-        </div>
+<div style="margin: 0 auto; padding-top: 150px; width: 50%;">
+  <form action="" id="reg" method="post">
+    <label for="">用户名：</label>  <input type="email" name="username"> <br>
+    <label for="">密  码：</label>  <input type="password" name="password"> <br>
+    <label for="">确认密码：</label> <input type="password" name="password_re">  <br>
+    <input type="submit" value="提交">
+    <div style="color: red;"><%= pagemsg %></div>
+  </form>
+</div>
 
-      </div>
-    </div>
-    <div class="home-parallax opacity-50">
-      <div data-parallaxify-range="100" class="parallax-layer" style="background-image: url(img/bg.jpg); "></div>
-    </div>
-  </div>
-</header>
 <div class="visible-xs mobile-basic-info">
   <div id="footer-spacer"></div>
   <footer id="footer" class="text-center">
