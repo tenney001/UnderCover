@@ -1,0 +1,68 @@
+<nav id="main-navbar" class="hidden-xs hidden-sm">
+  <div class="nav hidden-xs">
+    <div class="main-reorder pull-right">
+      <a href="#">
+        <i class="fa fa-bars"></i>
+      </a>
+    </div>
+
+    <div class="logo pull-left">
+      <a href="/">
+        <figure>
+          <img src="/img/logo1.png" class="light-logo" alt="Berg HTML Theme"/>
+          <img src="/img/logo2.png" class="dark-logo" alt="Berg HTML Theme"/>
+        </figure>
+      </a>
+    </div>
+    <div class="main-nav">
+      <% console.log("classindex:",classindex) %>
+      <ul class="pull-right">
+        <li>
+            <% if(classindex == '0'){ %>
+            <a href="/" class="active">Home</a>
+            <% } else { %>
+            <a href="/" class="">Home</a>
+            <% } %>
+        </li>
+        <li>
+          <% if(classindex == 1){ %>
+          <a href="/about" class="active">About</a>
+          <% } else { %>
+          <a href="/about" class="">About</a>
+          <% } %>
+        </li>
+        <li>
+          <% if(classindex == 2){ %>
+          <a href="/news" class="active">News</a>
+          <% } else { %>
+          <a href="/news" class="">News</a>
+          <% } %>
+        </li>
+        <li>
+          <% if(classindex == 3){ %>
+          <a href="/contact" class="active">Contact</a>
+          <% } else { %>
+          <a href="/contact" class="">Contact</a>
+          <% } %>
+        </li>
+        <li>
+          <% if(classindex == 4){ %>
+          <a href="#" class="active hover-subnav">User Center</a>
+          <% } else { %>
+          <a href="#" class="hover-subnav">User Center</a>
+          <% } %>
+          <div class="subnav">
+            <ul class="subnav-wrapper ">
+              <li>
+                <a href="/login" class="">Login</a>
+              </li>
+              <li>
+                <a href="/register" class="">Register</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

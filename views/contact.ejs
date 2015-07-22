@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ./inc/head.ejs %>
+
+
+</head>
+<body class="intro-fullscreen fixed-footer yo-anim-enabled">
+
+<!--content-->
+
+<% include ./inc/main-nav.ejs %>
+<% include ./inc/mobile-nav.ejs %>
+
+
+
+<div class="section-intro section-intro-parallax contact-fullscreen mobile-height" data-opacity-start="30" data-opacity-end="100">
+  <div class="bg-section map" id="map"></div>
+  <div class="mapMarkerColor"></div>
+  <div class="container-fluid pre-content hidden-xs">
+    <div class="row">
+      <div class="col-xs-12 col-md-8 col-md-offset-2">
+        <h1 class="yo-anim yo-anim-fade" data-animation-delay="100">We are happy to help</h1>
+        <p class="yo-anim yo-anim-fade" data-animation-delay="500">Suspendisse pellentesque ipsum non mauris rutrum mollis. Aliquam tristique dui et nunc iaculis, id accumsan nunc eleifend. Etiam ullamcorper risus vel mollis sagittis.Praesent id lobortis quam. Ut pretium nunc at arcu elementum molestie. Morbi euismod leo ut semper fringilla.</p>
+      </div>
+    </div>
+  </div>
+  <a class="arrow1 arrow-section hidden-xs" href="#">
+    <i class="fa fa-angle-down"></i>
+  </a>
+  <a class="arrow2 arrow-section hidden-xs" href="#" style="">
+    <i class="fa fa-angle-up"></i>
+  </a>
+</div>
+
+<div class="section-space"></div>
+
+<section id="contact" class="section-scroll main-section">
+  <header class="section-header">
+    <h2>Berg Restaurant</h2>
+  </header>
+  <div class="contact-content container section-padding">
+    <div class="row">
+      <div class="col-xs-12 col-md-5 v-card">
+        <h3>Information</h3>
+        <p>Integer congue tellus laoreet lectus iaculis, sit amet adipiscing elit lacinia. Integer eleifend sapien ut justo tristique, in adipiscing est sagittis.</p>
+        <div class="row">
+          <div class="col-sm-6">
+            <h3>Address</h3>
+            <address>
+              <strong>Berg Restaurant</strong><br/>
+              Armii Krajowej 17<br/>
+              58-100 Świdnica<br/>
+              <!-- <abbr title="Phone">P:</abbr> (123) 456-7890 -->
+            </address>
+          </div>
+          <div class="col-sm-6">
+            <h3>Contact</h3>
+            <p>
+              <a href="#" class="contact-email">restaurant@berg.com</a><br/>
+              <a href="tel:48889889889">+48 889 889 889</a><br/>
+              <a href="tel:48889889889">+48 889 888 860</a><br/>
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-7">
+        <h3>Contact Form</h3>
+        <form class="row" role="form" name="contact-form" id="contact-form" action="" method="POST">
+          <div class="col-md-6">
+            <div class="form-group">
+              <input type="name" class="form-control contact-form " id="contact-name" placeholder="Name" name="contact[name]">
+            </div>
+            <div class="form-group">
+              <input class="contact-form form-control " type="text" placeholder="Email" name="contact[email]" id="contact-email">
+            </div>
+            <div class="form-group">
+              <input class="contact-form form-control " type="text" placeholder="Subject" name="contact[subject]" id="contact-subject">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group message">
+              <textarea class="form-control input-row-3 contact-form " rows="6" placeholder="Message" name="contact[message]" id="contact-message"></textarea>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="form-group text-right button-submit btn-submit">
+              <button type="submit" class="btn btn-dark button-send">SEND A MESSAGE</button>
+              <div class="message-success alert-success alert hidden"><i class="fa fa-check"></i></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer-spacer"></div>
+<footer id="footer" class="text-center">
+
+  <a href="#" class="to-the-top">
+    <i class="fa fa-arrow-circle-o-up"></i>
+  </a>
+
+  <h2>Berg restaurant</h2>
+  <% include ./inc/container.ejs %>
+
+
+  <% include ./inc/copyrights.ejs %>
+</footer>
+<div class="gallery-wrapper"></div>
+
+<div id="preloader">
+  <div id="status">
+    <div class="loading-wrapper">
+      <img src="/img/logo2.png" alt="Loading"/>
+    </div>
+  </div>
+  <div id="status-loaded"></div>
+</div>
+
+<% include ./inc/script.ejs %>
+</body>
+</html>
+
+
