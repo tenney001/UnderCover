@@ -5970,7 +5970,7 @@ textarea:focus {
   .home-fullscreen .basic-info {
     top: 50%;
     bottom: initial;
-    margin-top: 40px;
+    /*margin-top: 40px;*/
   }
   .home {
     position: relative;
@@ -5988,6 +5988,7 @@ textarea:focus {
   .home .basic-info .mobile:hover a,
   .home .basic-info .email:hover a {
     color: #ca293e;
+    white-space: nowrap;
   }
   .home-page .to-the-top {
     display: block;

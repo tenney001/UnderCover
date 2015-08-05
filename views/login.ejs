@@ -4,6 +4,18 @@
 
   <% include ./inc/head.ejs %>
 
+  <!-- 新 Bootstrap 核心 CSS 文件 -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+  <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+  <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
 </head>
 <body class="show-nav nav-center home-page yo-anim-enabled">
 
@@ -13,11 +25,28 @@
 
 
 <div style="margin: 0 auto; padding-top: 150px; width: 50%;">
-  <form action="" id="login" method="post">
-    <label for="">用户名：</label>  <input type="email" name="username"> <br>
-    <label for="">密  码：</label>  <input type="password" name="password"> <br>
-    <input type="submit" value="登录">
-    <div style="color: red;"><%= pagemsg %></div>
+  <form action="" id="login" method="post" class="form-horizontal">
+    <div class="form-group">
+      <label for="username" class="col-sm-3 control-label">用户名：</label>
+      <div class="col-sm-9">
+        <input type="email" name="username" class="form-control" id="username" placeholder="Email">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="password" class="col-sm-3 control-label">密 码：</label>
+      <div class="col-sm-9">
+        <input type="password" name="password" class="form-control" id="password">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-9">
+        <button type="submit" class="btn btn-primary">登 录</button>
+        <a class="btn btn-success" href="/register" style=" margin-left: 10px;">我没有账号，我要注册</a>
+      </div>
+    </div>
+    <div class="form-group">
+      <div style="color: red;"><%= pagemsg %></div>
+    </div>
   </form>
 </div>
 
@@ -55,8 +84,7 @@
           </div>
           <div class="col-sm-6 col-lg-3">
             <div class="simple-contact">
-              <span class="mobile"><a href="#">+13888888888</a></span>
-              <span class="email"><a href="#">270078781@qq.com</a></span>
+              <span class="mobile"><a href="/room">进入游戏</a></span>
             </div>
           </div>
         </div>

@@ -23,6 +23,14 @@ app.set('port', port);
 var server = http.createServer(app);
 var io = require('socket.io')(server);
 
+
+io.on("connection",function(socket){
+  //room.socket = socket;
+  //Todo 运用socket的session，判断登录用户。如果未登录，则断开。
+  console.log("a user connect.. the socket is:",socket.handshake);
+
+});
+
 /**
  * Listen on provided port, on all network interfaces.
  */

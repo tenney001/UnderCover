@@ -4,9 +4,10 @@
 
 
 var User = function(){
-
+    this.username;
+    this.password;
+    this.nickname;
 }
-
 
 
 module.exports = User;

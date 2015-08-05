@@ -577,8 +577,12 @@
 
 		_finish = function () {
 			if (!$.support.opacity) {
-				content.get(0).style.removeAttribute('filter');
-				wrap.get(0).style.removeAttribute('filter');
+				try{
+					content.get(0).style.removeAttribute('filter');
+					wrap.get(0).style.removeAttribute('filter');
+				}catch(e){
+					console.log(e);
+				}
 			}
 
 			if (selectedOpts.autoDimensions) {

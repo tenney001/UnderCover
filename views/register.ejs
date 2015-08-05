@@ -4,6 +4,20 @@
 
   <% include ./inc/head.ejs %>
 
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <!-- 新 Bootstrap 核心 CSS 文件 -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+  <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+  <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
 </head>
 <body class="show-nav nav-center home-page yo-anim-enabled">
 
@@ -13,12 +27,40 @@
 
 
 <div style="margin: 0 auto; padding-top: 150px; width: 50%;">
-  <form action="" id="reg" method="post">
-    <label for="">用户名：</label>  <input type="email" name="username"> <br>
-    <label for="">密  码：</label>  <input type="password" name="password"> <br>
-    <label for="">确认密码：</label> <input type="password" name="password_re">  <br>
-    <input type="submit" value="提交">
-    <div style="color: red;"><%= pagemsg %></div>
+  <form action="" id="reg" method="post" class="form-horizontal">
+    <div class="form-group">
+      <label for="inputEmail3" class="col-sm-3 control-label">昵 称：</label>
+      <div class="col-sm-9">
+        <input type="text" name="nickname" class="form-control" id="nickname" placeholder="请输入昵称">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputEmail3" class="col-sm-3 control-label">用户名：</label>
+      <div class="col-sm-9">
+        <input type="email" name="username" class="form-control" id="username" placeholder="Email">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputPassword3" class="col-sm-3 control-label">密 码：</label>
+      <div class="col-sm-9">
+        <input type="password" name="password" class="form-control" id="password">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputPassword3" class="col-sm-3 control-label">确认密码：</label>
+      <div class="col-sm-9">
+        <input type="password" name="password_re" class="form-control" id="password_re">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-9">
+        <button type="submit" class="btn btn-primary">注 册</button>
+        <a class="btn btn-success" href="/login" style="margin-left: 10px">我有账号，我要登录</a>
+      </div>
+    </div>
+    <div class="form-group">
+      <div style="color: red;"><%= pagemsg %></div>
+    </div>
   </form>
 </div>
 
