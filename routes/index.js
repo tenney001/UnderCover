@@ -168,6 +168,10 @@ router.get('/room/:id',function(req,res,next){
       }
       //判断是否可以进入房间。
       //ToDo 判断是否可以进入房间。
+      if(!roomdata){
+        console.log("房间已经失效");
+        res.redirect("/gameLobby");
+      }
 
       //设置房间socket分组，然后进入房间。
       var room = new Room();
@@ -175,8 +179,10 @@ router.get('/room/:id',function(req,res,next){
       userGameData.roomId = room.roomId;
       req.session.userGameData = userGameData;
 
-
-      res.render('room',{user:req.session.user,room:room});
+      UserGameData.getUserByUserId(room.roomMaster,function(data){
+        console.log("getRoomMaster-data:",data);
+        res.render('room',{user:data,room:room});
+      })
     });
   })
 

@@ -19,7 +19,7 @@ UC_GameController.prototype = {
     },
     //游戏开始
     start:function(){
-        if(room.numUser >= this.minUser){
+        if(this.room.numUser >= this.minUser){
             //start
             //Todo start;
             this.State = roomState.Room_GameStart;
