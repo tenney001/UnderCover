@@ -76,7 +76,7 @@
 
                         <p>
                             <!-- todo 这里空了把超链接换成socket事件，否则会先跳转，再修改房间 。-->
-                            <a class="btn btn-success btn-block" href="/gameLobby">退出</a>
+                            <a id="leave_room" class="btn btn-success btn-block">退出</a>
                         </p>
                     </div>
                 </div>
@@ -144,60 +144,72 @@
 <script>
     $(function () {
         $("#msg_box").height(document.body.clientHeight - 50);
-    });
-    var socket = io();
-    $('#chat_form').submit(function () {
-        var sendmsg = $('#m').val();
-        if (sendmsg.length == 0) {
-            var str = "<p>请不要发送空信息</p>";
-            $('#myModal .modal-body').html(str);
-            $('#myModal').modal("show");
+
+        var socket = io();
+        //离开房间
+        $('#leave_room').click(function(){
+            socket.emit('out_room', "out");
+        });
+
+        //发送信息
+        $('#chat_form').submit(function () {
+            var sendmsg = $('#m').val();
+            if (sendmsg.length == 0) {
+                var str = "<p>请不要发送空信息</p>";
+                $('#myModal .modal-body').html(str);
+                $('#myModal').modal("show");
+                return false;
+            }
+            socket.emit('chat message', sendmsg);
+            $('#m').val('');
             return false;
+        });
+
+        //接收服务端命令
+        socket.on('chat message', function (msg) {
+            $('#messages').append($('<li>').text(msg));
+            $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
+        });
+        socket.on('server message', function (msg) {
+            $('#messages').append($('<li style="color:red;">系统提示：').text(msg));
+            $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
+        });
+
+        socket.on('my keywords', function (msg) {
+            $('#messages').append($('<li style="color:blue">关键词信息：').text(msg));
+            $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
+        });
+        socket.on('out_room',function(msg){
+            window.location.href = msg.callback_url;
+        });
+
+        //接收服务端指令
+        socket.on('service order', function (order) {
+            switch (order.order_type) {
+                case "url":
+                    window.location.href = order.order_code;
+                    break;
+                case "userList":
+                    updateUserList(order.order_code);
+                    break;
+                case "roomMaster":
+                    updataMaster(order.order_code);
+                    break;
+            }
+        });
+
+        function updateUserList(list) {
+            var str = '';
+            for (var i = 0; i < list.length; i++) {
+                str += '<p class="text-danger" title="等级:' + list[i].level + ', 经验值:' + list[i].exp + '">' + list[i].nickname + '</p>';
+            }
+            $("#userlist").html(str);
         }
-        socket.emit('chat message', sendmsg);
-        $('#m').val('');
-        return false;
-    });
-    socket.on('chat message', function (msg) {
-        $('#messages').append($('<li>').text(msg));
-        $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
-    });
-    socket.on('server message', function (msg) {
-        $('#messages').append($('<li style="color:red;">系统提示：').text(msg));
-        $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
-    });
 
-    socket.on('my keywords', function (msg) {
-        $('#messages').append($('<li style="color:blue">关键词信息：').text(msg));
-        $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
-    });
-
-    //接收服务端指令
-    socket.on('service order', function (order) {
-        switch (order.order_type) {
-            case "url":
-                window.location.href = order.order_code;
-                break;
-            case "userList":
-                updateUserList(order.order_code);
-                break;
-            case "roomMaster":
-                updataMaster(order.order_code);
-                break;
+        function updataMaster(nickname) {
+            $("#roomMaster").html(nickname);
         }
     });
-
-    function updateUserList(list) {
-        var str = '';
-        for (var i = 0; i < list.length; i++) {
-            str += '<p class="text-danger" title="等级:' + list[i].level + ', 经验值:' + list[i].exp + '">' + list[i].nickname + '</p>';
-        }
-        $("#userlist").html(str);
-    }
-
-    function updataMaster(nickname) {
-        $("#roomMaster").html(nickname);
-    }
 </script>
 </body>
 </html>

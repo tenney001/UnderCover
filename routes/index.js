@@ -160,6 +160,10 @@ router.get('/room/:id',function(req,res,next){
       })
     }
     var id = req.param('id');
+    if(id == 'undefined'){
+      res.end();
+      return false;
+    }
     var roomModel = db.get('roomModel');
     roomModel.find({_id:id},{},function(err,roomdata){
       if(err){
