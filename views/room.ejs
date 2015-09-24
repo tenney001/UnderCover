@@ -179,9 +179,9 @@
             $('#messages').append($('<li style="color:blue">关键词信息：').text(msg));
             $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
         });
-        socket.on('out_room',function(msg){
-            window.location.href = msg.callback_url;
-        });
+//        socket.on('out_room',function(msg){
+//            window.location.href = msg.callback_url;
+//        });
 
         //接收服务端指令
         socket.on('service order', function (order) {

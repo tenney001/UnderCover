@@ -85,7 +85,7 @@ var socketHandler = function(socket){
 
                 //当用户离开房间时
                 socket.on('out_room',function(){
-                    socket.emit('out_room',{callback_url:"/gameLobby"});
+                    socket.emit("service order",{order_type:"url",order_code:"/gameLobby"});
                     socket.disconnect();
                 })
             }
@@ -116,12 +116,11 @@ function userLeave(socket,room,user){
         room = room.dbToRoom(rs_room_data);
         room.leaveRoom(user, function (roomobj) {
             //判断房间是否空置，如果没人，删除房间
-            console.log('roomobj.users.length:',roomobj.users.length);
             if(roomobj.users.length==0){
                 roomModel.remove({_id:room._id});
             }
             //用户离开
-            //socket.emit("out_room",{callback_url:"/gameLobby"});
+            //socket.emit("service order",{order_type:"url",order_code:"/gameLobby"});
             console.log("a user disconnected");
             socket.broadcast.to(room.socketGroup).emit('server message', " "+user.nickname+" 离开房间");
             //更新页面信息
