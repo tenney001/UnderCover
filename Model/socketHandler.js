@@ -62,56 +62,49 @@ function addRoom (socket) {
                     }
                 }
 
-                var join_rs = room.joinRoom(user,"");
-                if(join_rs.rs == "err"){
-                    socket.emit('service order',{order_type:"get_out",order_code:join_rs.msg});
-                    // socket.disconnect();
-                    return false;
-                }else{
-                    //将当前socket对象装入socket集合。
-                    room = join_rs.data;
-                    socket_Arr[socket.handshake.session.userGameData.nickname] = socket;
-                    room.socketsArr = socket_Arr;
-                }
-                // console.log("room:",room);
-                //加入分组
-                socket.join(room.socketGroup);
-                //发送消息给分组成员
-                socket.broadcast.to(room.socketGroup).emit('server message', "欢迎 "+user.nickname+" 进入房间");
+                // var join_rs = room.joinRoom(user,"");
+                room.joinRoom(socket,"",socket_Arr,function (_room) {
+                    if(_room.rs ==  "err"){
+                        socket.emit('service order',{order_type:"get_out",order_code:_room.msg});
+                        // socket.disconnect();
+                        return false;
+                    }else{
 
-                //设置当前房间
-                the_room = room;
-                //更新页面信息
-                updatePageInfo(room,socket);
+                        //设置当前房间
+                        the_room = _room;
+                        //更新页面信息
+                        updatePageInfo(_room,socket);
 
-                //当触发‘chat message’时
-                socket.on('chat message',function(msg){
-                    if(room.roomState != roomState.Room_GameStart){
-                        msg = user.nickname + " : "+msg;
-                        console.log("msg from user :",msg);
-                        socket.broadcast.to(room.socketGroup).emit('chat message', msg);
-                        socket.emit('chat message',msg);
+                        //当触发‘chat message’时
+                        socket.on('chat message',function(msg){
+                            if(room.roomState != roomState.Room_GameStart){
+                                msg = user.nickname + " : "+msg;
+                                console.log("msg from user :",msg);
+                                socket.broadcast.to(room.socketGroup).emit('chat message', msg);
+                                socket.emit('chat message',msg);
+                            }
+                        })
+                        //当客户端发来命令时
+                        socket.on('client order',function (msgObj) {
+                            switch(msgObj.order_type){
+                                case "game_start":
+                                    game_start(the_room,socket);
+                                break;
+                            }
+                        })
+
+                        //当连接关闭时
+                        socket.on('disconnect',function(){
+                            userLeave(socket,room,user);
+                        });
+
+                        //当用户离开房间时
+                        socket.on('out_room',function(){
+                            socket.emit("service order",{order_type:"url",order_code:"/gameLobby"});
+                            socket.disconnect();
+                        })
                     }
-                })
-                //当客户端发来命令时
-                socket.on('client order',function (msgObj) {
-                    switch(msgObj.order_type){
-                        case "game_start":
-                            game_start(the_room,socket);
-                        break;
-                    }
-                })
-
-                //当连接关闭时
-                socket.on('disconnect',function(){
-                    userLeave(socket,room,user);
                 });
-
-                //当用户离开房间时
-                socket.on('out_room',function(){
-                    socket.emit("service order",{order_type:"url",order_code:"/gameLobby"});
-                    socket.disconnect();
-                })
             }
         })
     }else {
@@ -169,6 +162,8 @@ function game_start (_room,socket) {
             var rs = _room.getStart();
             if(rs && !rs.rs){
                 socket.emit("service order",{order_type:"start_failure",order_code:rs.msg});
+            }else{
+                _room.saveRoom();
             }
         }
     })
@@ -182,3 +177,4 @@ function game_start (_room,socket) {
 
 
 module.exports = socketHandler;
+

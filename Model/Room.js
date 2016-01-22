@@ -76,44 +76,54 @@ Room.prototype = {
         return this;
     },
     //加入房间。
-    joinRoom:function(user,pwd){
+    joinRoom:function(socket,pwd,socket_Arr,callback){
+
+        var user = socket.handshake.session.user;
+        var errObj = {rs:true};
         //判断是否能进入房间。
         if(this.numUser>=this.maxUser){
             console.log('room-join-err:房间人数已满.');
-            return {rs:"err",msg:"房间人数已满."};
+            errObj = {rs:"err",msg:"加入被拒绝：房间人数已满."};
         }
-        if(this.roomPassword!=pwd){
+        else if(this.roomPassword!=pwd){
             console.log('room-join-err:房间密码错误.');
-            return {rs:"err",msg:"房间密码错误."};
+            errObj = {rs:"err",msg:"加入被拒绝：房间密码错误."};
         }
-        if(this.roomState == roomState.Room_GameStart){
+        else if(this.roomState == roomState.Room_GameStart){
             console.log('room-join-err:游戏已经开始.');
-            return {rs:"err",msg:"游戏已经开始."};
+            errObj = {rs:"err",msg:"加入被拒绝：游戏已经开始."};
         }
-        //判断user是否在房间，如果不在，将user存入房间，并将房间号存入user
-        var flag = false;
-        for(var i=0;i<this.users.length;i++){
-            if(this.users[i] == user){
-                flag = true;
-                break;
+        if(errObj.rs == "err"){
+            callback(errObj);
+        }else{
+            //判断user是否在房间，如果不在，将user存入房间，并将房间号存入user
+            var flag = false;
+            for(var i=0;i<this.users.length;i++){
+                if(this.users[i]._id == user._id){
+                    flag = true;
+                    break;
+                }
             }
+            if(!flag){
+                //将user装入房
+                this.users.push(user);
+                user.roomId = this.roomId;
+            }
+            //将当前socket对象装入socket集合。
+            // this.socketsArr.push(socket);
+            socket_Arr[socket.handshake.session.userGameData.nickname] = socket;
+            this.socketsArr = socket_Arr;
+            this.numUser = this.users.length;
+            //加入分组
+            socket.join(this.socketGroup);
+            //发送消息给分组成员
+            socket.broadcast.to(this.socketGroup).emit('server message', "欢迎 "+user.nickname+" 进入房间");
+
+
+            this.saveRoom(callback);
         }
-        if(!flag){
-            this.users.push(user);
-            user.roomId = this.roomId;
-        }
 
-        this.numUser = this.users.length;
-        // if(gameController.minUser==this.numUser){
-        //     this.roomState = roomState.Room_GameStart;
-        //     //游戏启动。
-        //     // this.getStart();
 
-        // }else{
-        //     this.saveRoom();
-        // }
-
-        return {rs:"ok",data:this};
     },
     //退出房间。
     leaveRoom:function(user,socket,callback){
