@@ -72,11 +72,14 @@
                     <div class="">
                         <p>房间名：<%= room.roomName %></p>
 
-                        <p>本房间房主为：<span id="roomMaster"><%= user.nickname %></span></p>
+                        <p>本房间房主为：<span id="roomMaster"><%= roomMaster.nickname %></span></p>
 
-                        <p>
+                        <p id="start_div">
+                            <% if(room.roomMaster == user._id){ %>
+                            <input type="button" id="start_game" class="btn btn-danger btn-block" value="Start" />
+                            <%}%>
                             <!-- todo 这里空了把超链接换成socket事件，否则会先跳转，再修改房间 。-->
-                            <a id="leave_room" class="btn btn-success btn-block">退出</a>
+                            <!-- <a id="leave_room" class="btn btn-success btn-block">退出</a> -->
                         </p>
                     </div>
                 </div>
@@ -142,10 +145,17 @@
 <script src="//cdn.bootcss.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
+    var nickname = "<%= user.nickname %>";
     $(function () {
         $("#msg_box").height(document.body.clientHeight - 50);
 
         var socket = io();
+
+        //游戏开始
+        $("#start_game").live("click",function () {
+            socket.emit("client order",{order_type:"game_start",order_code:""});
+            $(this).attr("disabled","disabled").text("游戏中");
+        });
         //离开房间
         $('#leave_room').click(function(){
             socket.emit('out_room', "out");
@@ -160,10 +170,25 @@
                 $('#myModal').modal("show");
                 return false;
             }
-            socket.emit('chat message', sendmsg);
-            $('#m').val('');
+            if(window.describeWords){
+                socket.emit('client order', {order_type:"describeWords",order_code:sendmsg});
+                $('#m').val('');
+                window.describeWords = false;
+                clearTimeout(window.mydesc);
+            }else if(window.vote){
+                socket.emit('client order', {order_type:"vote",order_code:sendmsg});
+                $('#m').val('');
+                window.vote = false;
+                clearTimeout(window.myvote);
+            }else{
+                socket.emit('chat message', sendmsg);
+                $('#m').val('');
+            }
             return false;
         });
+
+        //发送客户端命令
+
 
         //接收服务端命令
         socket.on('chat message', function (msg) {
@@ -171,14 +196,22 @@
             $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
         });
         socket.on('server message', function (msg) {
-            $('#messages').append($('<li style="color:red;">系统提示：').text(msg));
-            $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
+            if(typeof msg == "object" && msg.order_type=="describeWords"){
+                $('#messages').append($('<li style="color:blue;"></li>').text(msg.order_code));
+                $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
+            }else if(typeof msg == "object" && msg.order_type=="vote"){
+                $('#messages').append($('<li style="color:blue;"></li>').text(msg.order_code));
+                $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
+            }else{
+                $('#messages').append($('<li style="color:red;"></li>').text("系统提示："+msg));
+                $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
+            }
         });
 
-        socket.on('my keywords', function (msg) {
-            $('#messages').append($('<li style="color:blue">关键词信息：').text(msg));
-            $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
-        });
+        // socket.on('my keywords', function (msg) {
+        //     $('#messages').append($('<li style="color:blue">关键词信息：</li>').text(msg));
+        //     $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
+        // });
 //        socket.on('out_room',function(msg){
 //            window.location.href = msg.callback_url;
 //        });
@@ -186,6 +219,9 @@
         //接收服务端指令
         socket.on('service order', function (order) {
             switch (order.order_type) {
+                case "start_failure":
+                    start_failure(order.order_code);
+                    break;
                 case "url":
                     window.location.href = order.order_code;
                     break;
@@ -195,19 +231,71 @@
                 case "roomMaster":
                     updataMaster(order.order_code);
                     break;
+                case "describeWords":
+                    describeWords();
+                    break;
+                case "vote":
+                    vote();
+                    break;
+                case "gameover":
+                    gameover(order.order_code);
+                    break;
+                case "get_out":
+                    get_out(order_code);
+                    break;
             }
         });
 
         function updateUserList(list) {
             var str = '';
             for (var i = 0; i < list.length; i++) {
-                str += '<p class="text-danger" title="等级:' + list[i].level + ', 经验值:' + list[i].exp + '">' + list[i].nickname + '</p>';
+                if(nickname == list[i].nickname){
+                    str += '<p class="text-danger" title="等级:' + list[i].level + ', 经验值:' + list[i].exp + '">' + list[i].nickname + '(我)</p>';
+                }else{
+                    str += '<p class="text-danger" title="等级:' + list[i].level + ', 经验值:' + list[i].exp + '">' + list[i].nickname + '</p>';
+                }
             }
             $("#userlist").html(str);
         }
 
-        function updataMaster(nickname) {
-            $("#roomMaster").html(nickname);
+        function updataMaster(_nickname) {
+            $("#start_div").empty();
+            if(nickname == _nickname){
+                $("#start_div").append('<input type="button" id="start_game" class="btn btn-danger btn-block" value="Start" />');
+            }
+            $("#roomMaster").html(_nickname);
+        }
+        function describeWords () {
+            //描述环节
+            window.describeWords = true;
+            window.mydesc = setTimeout(function (argument) {
+                if(window.describeWords){
+                    socket.emit('client order', {order_type:"describeWords",order_code:""});
+                    window.describeWords = false;
+                }
+            },30000);
+        }
+        function vote () {
+            //投票环节
+            window.vote = true;
+            window.myvote = setTimeout(function () {
+                if(window.vote){
+                    socket.emit('client order', {order_type:"vote",order_code:""});
+                    window.vote = false;
+                }
+            },15000)
+        }
+        function start_failure (order_code) {
+            $('#messages').append($('<li style="color:red;"></li>').text(order_code));
+            $('#msg_box').scrollTop($('#messages')[0].scrollHeight);
+            $("#start_game").attr("disabled",false).text("Start");
+        }
+        function gameover (order_code) {
+            $("#start_game").attr("disabled",false).text("Start");
+        }
+        function get_out (order_code) {
+            alert(order_code);
+            window.location.href = "/gameLobby";
         }
     });
 </script>

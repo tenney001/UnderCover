@@ -29,48 +29,43 @@
 <div style="width: 80%; margin: 0 auto; padding-top: 100px;">
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h3 class="panel-title">游戏房间列表</h3>
+      <h3 class="panel-title">我的关键词</h3>
     </div>
     <div class="panel-body">
-      <div><button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#myModal">创建房间</button></div>
+      <div><button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#myModal">创建关键词</button></div>
       <table class="table table-hover" style="margin-top: 20px;">
         <tr>
-          <th>房间名称</th>
-          <th>房间类型</th>
-          <th>房间状态</th>
-          <th>房间人数</th>
+          <th>关键词1</th>
+          <th>关键词2</th>
+          <th>关键词3</th>
+          <th>关键词4</th>
+          <th>关键词5</th>
+          <th>审核状态</th>
           <th>创建时间</th>
-          <th>点击进入</th>
         </tr>
         <% for(var i=0;i<data.length;i++){ %>
         <tr>
-          <td><%= data[i].roomName %></td>
-          <td>
-              <% if(data[i].roomType==1){ %>
-                谁是卧底
-              <%}%>
-          </td>
-          <td>
-            <% if(data[i].roomState ==0){ %>
-              等待加入
+          <td><%= data[i].word1 %></td>
+          <td><%= data[i].word2 %></td>
+          <td><%= data[i].word3 %></td>
+          <td><%= data[i].word4 %></td>
+          <td><%= data[i].word5 %></td>
+          <td>  
+            <% if(data[i].auditState ==0){ %>
+              待审核
             <%}%>
 
-            <% if(data[i].roomState !=0){ %>
-              游戏开始
+            <% if(data[i].auditState ==1){ %>
+              审核通过
             <%}%>
 
+            <% if(data[i].auditState ==10){ %>
+              审核未通过
+            <%}%>
           </td>
-          <td><%= data[i].users.length %> / <%= data[i].maxUser %></td>
           <td>
               <% var d = new Date();d.setTime(data[i].createTime) %>
               <%= d.getFullYear()+"-"+ (d.getMonth()+1)+"-"+ d.getDate() + " " + d.getHours()+":"+ d.getSeconds() %>
-          </td>
-          <td>
-            <% if(data[i].roomState ==0){ %>
-              <a class="btn btn-primary  btn-xs" href="/room/<%= data[i]._id %>">我要加入</a>
-            <%}else{%>
-              <a class="btn btn-default  btn-xs" href="javascript:alert('该房间游戏已经开始，请选择其他房间')">已经开始</a>
-            <%}%>
           </td>
         </tr>
         <% } %>
@@ -101,43 +96,40 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">创建房间</h4>
+        <h4 class="modal-title" id="myModalLabel">创建关键词</h4>
       </div>
       <div class="modal-body">
-        <form action="" id="reg" method="post" class="form-horizontal">
+        <form action="" id="addKeywords" method="post" class="form-horizontal">
           <div class="form-group">
-            <label for="inputEmail3" class="col-sm-3 control-label">房间名字：</label>
+            <label for="inputEmail3" class="col-sm-3 control-label">关键词1：</label>
             <div class="col-sm-9">
-              <input type="text" name="roomName" class="form-control" id="roomName" value="<%= user.nickname %>的房间">
+              <input type="text" name="word1" class="form-control" id="word1" value="">
             </div>
           </div>
           <div class="form-group">
-            <label for="inputEmail3" class="col-sm-3 control-label">房间类型：</label>
+            <label for="inputEmail3" class="col-sm-3 control-label">关键词2：</label>
             <div class="col-sm-9">
-              <!-- Single button -->
-              <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  谁是卧底 <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a href="#">谁是卧底</a></li>
-                </ul>
-              </div>
+              <input type="text" name="word2" class="form-control" id="word2" value="">
             </div>
           </div>
           <div class="form-group">
-            <label for="inputPassword3" class="col-sm-3 control-label">房间人数：</label>
+            <label for="inputEmail3" class="col-sm-3 control-label">关键词3：</label>
             <div class="col-sm-9">
-              <input type="number" name="maxUser" class="form-control" id="maxUser" placeholder="4-8人之间">
+              <input type="text" name="word3" class="form-control" id="word3" value="">
             </div>
           </div>
-          <!--暂时不开放密码-->
-          <!--<div class="form-group">-->
-          <!--<label for="roomPassword" class="col-sm-3 control-label">房间密码：</label>-->
-          <!--<div class="col-sm-9">-->
-          <!--<input type="password" name="roomPassword" class="form-control" id="roomPassword">-->
-          <!--</div>-->
-          <!--</div>-->
+          <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">关键词4：</label>
+            <div class="col-sm-9">
+              <input type="text" name="word4" class="form-control" id="word4" value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">关键词1：</label>
+            <div class="col-sm-9">
+              <input type="text" name="word5" class="form-control" id="word5" value="">
+            </div>
+          </div>
           <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
               <a class="btn btn-primary" id="sub_create">确定</a>
@@ -156,30 +148,33 @@
 
 
 
+      <div style="color: red;"><%= pagemsg %></div>
 <!--  Bootstrap 核心 JavaScript 文件 -->
 <script src="//cdn.bootcss.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script type="text/javascript">
   $(function () {
 
     $("#sub_create").click(function(e){
-      e.preventDefault();
-      var roomObj = {
-        roomName:$("#roomName").val(),
-        roomType:1,
-        maxUser:parseInt($("#maxUser").val()),
-        roomPassword:""
-      }
-      console.info(roomObj);
+        $("#addKeywords")[0].submit();
+    //   e.preventDefault();
+    //   var roomObj = {
+    //     roomName:$("#roomName").val(),
+    //     roomType:1,
+    //     maxUser:parseInt($("#maxUser").val()),
+    //     roomPassword:""
+    //   }
+    //   console.info(roomObj);
 
-      $.post("/ajax/createRoom",roomObj,function(data){
-        if(data.state == 'ok'){
-          console.log(data);
-          var id = data.data._id;
-          window.location.href = '/room/'+id;
-        }else{
-          alert(data.msg);
-        }
-      })
+    //   $.post("/ajax/createRoom",roomObj,function(data){
+    //     if(data.state == 'ok'){
+    //       console.log(data);
+    //       var id = data.data._id;
+    //       window.location.href = '/room/'+id;
+    //     }else{
+    //       alert(data.msg);
+    //     }
+    //   })
+    // });
     });
   });
 </script>

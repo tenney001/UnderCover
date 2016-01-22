@@ -3,6 +3,7 @@ var router = express.Router();
 var UserModel = require('../Model/User');
 var UserGameData = require('../Model/UC_GameData');
 var Room = require('../Model/Room');
+var ProxyKeywords = require('../Model/ProxyKeywords');
 var config = require('../config');
 var db = config.getDB();
 //Todo 用Async来做异步流程控制。
@@ -185,12 +186,47 @@ router.get('/room/:id',function(req,res,next){
 
       UserGameData.getUserByUserId(room.roomMaster,function(data){
         console.log("getRoomMaster-data:",data);
-        res.render('room',{user:data,room:room});
+        res.render('room',{roomMaster:data,room:room,user:userdata});
       })
     });
   })
 
 });
+
+
+//添加关键词
+router.get('/keywords',function(req,res,next){
+  if(req.session && req.session.user){
+    var proxyKeywords = new ProxyKeywords();
+    proxyKeywords.getWords({authorId:req.session.user._id},function (data) {
+      res.render('keywords',{ title: '我的关键词',classindex: 4, pagemsg: '',data:data });
+    });
+  }else{
+    res.redirect('/login');
+  }
+})
+
+router.post('/keywords',function (req,res,next) {
+  if(req.session && req.session.user){
+    var proxyKeywords = new ProxyKeywords();
+    proxyKeywords.word1 = req.body.word1;
+    proxyKeywords.word2 = req.body.word2;
+    proxyKeywords.word3 = req.body.word3;
+    proxyKeywords.word4 = req.body.word4;
+    proxyKeywords.word5 = req.body.word5;
+    proxyKeywords.auditState = 0;
+    proxyKeywords.authorId = req.session.user._id;
+
+    proxyKeywords.addWords(function (rs_data) {
+      console.log(rs_data);
+      // res.render('addKeywords',{title: '我的关键词',classindex: 4, pagemsg: '',data:rs_data});
+      res.redirect('/keywords');
+    });
+
+  }else{
+    res.redirect('/login');
+  }
+})
 
 
 module.exports = router;
