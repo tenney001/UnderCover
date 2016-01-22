@@ -319,8 +319,8 @@ UC_GameController.prototype = {
                     gameEnalbedUserNumber++;
                 }
             }
-            //如果剩余游戏玩家数量小于或等于3，并且平民没有胜利，则卧底胜利
-            if(gameEnalbedUserNumber<=3 && !isCiviliansWinner){
+            //如果剩余游戏玩家数量小于3，并且平民没有胜利，则卧底胜利
+            if(gameEnalbedUserNumber<3 && !isCiviliansWinner){
                 //卧底没被找到，游戏结束，卧底胜利。
                 this.room.roomState = roomState.Room_GameOver;
                 this.sendMsg(this.room.socketsArr,'server message','卧底没被找到，游戏结束，卧底获胜。。');
@@ -329,7 +329,7 @@ UC_GameController.prototype = {
                 this.getAward("underCover");
             }
             //如果剩余游戏玩家数量大于3，并且平民没有胜利，则游戏继续。
-            else if(gameEnalbedUserNumber>3 && !isCiviliansWinner){
+            else if(gameEnalbedUserNumber>2 && !isCiviliansWinner){
                 //将阵亡人员信息更新后的集合装入容器
                 this.setAllSockets(so_arr);
 
