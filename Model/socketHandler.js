@@ -57,7 +57,7 @@ function addRoom (socket) {
                     if(room.users[i].userId == user.userId){
                         socket.emit('server message', "不能重复加入房间");
                         socket.disconnect();
-                        userLeave(socket,room,user);
+                        userLeave(socket,room);
                         return false;
                     }
                 }
@@ -95,7 +95,7 @@ function addRoom (socket) {
 
                         //当连接关闭时
                         socket.on('disconnect',function(){
-                            userLeave(socket,room,user);
+                            userLeave(socket,the_room);
                         });
 
                         //当用户离开房间时
@@ -129,7 +129,8 @@ function updatePageInfo(room,socket,backfun){
 }
 
 //用户离开时
-function userLeave(socket,room,user){
+function userLeave(socket,room){
+    var user = socket.handshake.session.user;
     Room.getRoomById(room.roomId, function (rs_room_data) {
         room = room.dbToRoom(rs_room_data);
         room.leaveRoom(user, function (roomobj) {
@@ -139,11 +140,12 @@ function userLeave(socket,room,user){
             }
             //用户离开
             //socket.emit("service order",{order_type:"url",order_code:"/gameLobby"});
+            socket.handshake.session.user.roomId = "";
             socket.handshake.session.userGameData.roomId = "";
             console.log("a user disconnected");
             socket.broadcast.to(room.socketGroup).emit('server message', " "+user.nickname+" 离开房间");
             //更新页面信息
-            updatePageInfo(room,socket);
+            updatePageInfo(roomobj,socket);
         });
     });
 }

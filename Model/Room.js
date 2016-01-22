@@ -126,21 +126,21 @@ Room.prototype = {
 
     },
     //退出房间。
-    leaveRoom:function(user,socket,callback){
+    leaveRoom:function(user,callback){
 
         var self = this;
         //todo 房间人员-1，并且删除房间的该人员，该人员的房间ID号需要清空。
         var tempArr  = [];
         for(var i=0;i<self.users.length;i++){
-            if(self.users[i].userId != user.userId){
+            if(self.users[i]._id != user._id){
                 tempArr.push(self.users[i]);
             }
         }
         self.users = tempArr;
 
         //todo 判断离开房间的是不是房主，如果是，需要变更房主。
-        if(self.roomMaster == user.userId && self.users.length>0){
-            self.roomMaster = self.users[0].userId;
+        if(self.roomMaster == user._id && self.users.length>0){
+            self.roomMaster = self.users[0]._id;
         }
 
         self.numUser = self.users.length;
