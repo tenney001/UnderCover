@@ -52,7 +52,9 @@ router.post('/login', function(req, res, next) {
   userModel.find(user,{},function(err,data){
     if(err)res.render('login', { title: '谁是卧底-登录',classindex: 4, pagemsg: '登录异常' });
     if(data && data.length>0){
-      req.session.user = data[0];
+      var userData = data[0];
+      userData.password = undefined;
+      req.session.user = userData;
       console.log(req.session)
       //res.render('login', { title: '谁是卧底-登录',classindex: 4, pagemsg: '登录成功' });
       res.redirect('/gameLobby');

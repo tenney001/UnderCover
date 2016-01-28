@@ -13,17 +13,19 @@ var config = require('../config'),
     //room数据库映射
     roomModel = db.get('roomModel');
 var uc_GameController = new UC_GameController();
-var the_room = new Room();
+var the_room = {};
 
 
 var socketHandler = function(socket){
     //room.socket = socket;
     //Todo 运用socket的session，判断登录用户。如果未登录，则断开。
     var socket_session = socket.handshake.session;
-    if(!socket_session || !socket_session.userGameData){
-        socket.emit('service msg',"请先登录。。");
+    if(!socket_session || !socket_session.user){
+        socket.emit('server message',"请先登录。。");
         socket.disconnect();
+        return false;
     }
+
     //console.log("a user connect.. the socket session is:",socket.handshake.session);
     //console.log("this user's user:",socket.handshake.session.user);
     //console.log("this user's userGameData:",socket.handshake.session.userGameData);
@@ -60,7 +62,19 @@ function addRoom (socket) {
                         userLeave(socket,room);
                         return false;
                     }
+                } 
+                if(socket_Arr[socket.handshake.session.user._id] && socket_Arr[socket.handshake.session.user._id].id == socket.id){
+                    socket.emit('server message', "不能重复加入房间");
+                    userLeave(socket,room);
+                    return false;
                 }
+                // for(so in room.socketsArr){ 
+                //     if(room.socketsArr.length> 0 && socket.handshake.session.user._id == room.socketsArr[so].handshake.session.user._id){
+                //         socket.emit('server message', "不能重复加入房间");
+                //         userLeave(socket,room);
+                //         return false; 
+                //     }
+                // }
 
                 // var join_rs = room.joinRoom(user,"");
                 room.joinRoom(socket,"",socket_Arr,function (_room) {
@@ -71,13 +85,14 @@ function addRoom (socket) {
                     }else{
 
                         //设置当前房间
-                        the_room = _room;
+                        the_room[_room._id] = _room;
+
                         //更新页面信息
                         updatePageInfo(_room,socket);
 
                         //当触发‘chat message’时
                         socket.on('chat message',function(msg){
-                            if(room.roomState != roomState.Room_GameStart){
+                            if(the_room[this.handshake.session.userGameData.roomId].roomState != roomState.Room_GameStart){
                                 msg = user.nickname + " : "+msg;
                                 console.log("msg from user :",msg);
                                 socket.broadcast.to(room.socketGroup).emit('chat message', msg);
@@ -88,14 +103,28 @@ function addRoom (socket) {
                         socket.on('client order',function (msgObj) {
                             switch(msgObj.order_type){
                                 case "game_start":
-                                    game_start(the_room,socket);
+                                    if(this.handshake.session.userGameData.roomId){
+                                        game_start(the_room[this.handshake.session.userGameData.roomId],socket);
+                                    }else{
+                                        socket.emit('server message', "房间号错误");
+                                    }
                                 break;
                             }
                         })
 
                         //当连接关闭时
                         socket.on('disconnect',function(){
-                            userLeave(socket,the_room);
+                            for(var v in socket_Arr){
+                                if(this.handshake.session.user._id == v){
+                                    delete socket_Arr[v];
+                                }
+                            }
+                            // for(var i=0;i<socket_Arr.length;i++){
+                            //     if(this.handshake.session.user._id == socket_Arr[i].handshake.session.user._id){
+                            //         socket_Arr.splice(i,1); 
+                            //     }
+                            // }
+                            userLeave(socket,the_room[socket.handshake.session.userGameData.roomId]);
                         });
 
                         //当用户离开房间时
@@ -133,7 +162,7 @@ function userLeave(socket,room){
     var user = socket.handshake.session.user;
     Room.getRoomById(room.roomId, function (rs_room_data) {
         room = room.dbToRoom(rs_room_data);
-        room.leaveRoom(user, function (roomobj) {
+        room.leaveRoom(socket, function (roomobj) {
             //判断房间是否空置，如果没人，删除房间
             if(roomobj.users.length==0){
                 roomModel.remove({_id:room._id});
@@ -161,6 +190,17 @@ function game_start (_room,socket) {
             socket.emit("service order",{order_type:"start_failure",order_code:"没有权限"});
         }else{
             socket.emit("server message","正在启动游戏");
+            //开启房间
+            _room.roomState = roomState.Room_GameStart;
+            the_room[_room._id] = _room;
+            //重新设置房间玩家socket
+            var playerSocketArr = [];
+            for(v in _room.socketsArr){
+                playerSocketArr.push(socket_Arr[_room.socketsArr[v]]);
+            }
+            _room.socketsArr = playerSocketArr;
+            
+
             var rs = _room.getStart();
             if(rs && !rs.rs){
                 socket.emit("service order",{order_type:"start_failure",order_code:rs.msg});

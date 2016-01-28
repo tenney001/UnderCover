@@ -7,6 +7,7 @@ var roomState = require('./RoomState');
 var UC_GameData = require('./UC_GameData');
 var ProxyKeywords = require('./ProxyKeywords');
 
+
 //谁是卧底，游戏控制器
 var UC_GameController = function(){
 
@@ -23,6 +24,7 @@ var UC_GameController = function(){
         return ALLSOCKETS;
     }
     this.setAllSockets = function (sockets) {
+        console.log("setAllSockets:",sockets);
         ALLSOCKETS = sockets;
     }
 }
@@ -39,17 +41,16 @@ UC_GameController.prototype = {
             //Todo start;
             this.State = roomState.Room_GameStart;
             this.setRoom(room);
-            // console.log("game start ..");
-            // console.log("room-sockets",room.socketsArr);
-            var socketsArr = room.socketsArr;
-            this.gameInit(socketsArr);
+            this.setAllSockets(room.socketsArr);
+            this.gameInit();
         }else{
             //失败,并返回原因。
             return {rs:false,msg:"房间人数不足"}
         }
     },
-    gameInit:function (socketsArr) {
+    gameInit:function () {
         var self = this;
+        socketsArr = self.getAllSockets();
         //游戏初始化
         
         var so_arr = [];
@@ -88,7 +89,8 @@ UC_GameController.prototype = {
             //收到客户端消息
             socketsArr[so].on("chat message",function (msgObj) {
                 if(this.alive && this.sayHi){
-                    self.sendMsg(self.room.socketsArr,"chat message",msgObj);
+                    msgObj = this.handshake.session.userGameData.nickname+":"+msgObj;
+                    self.sendMsg(self.getAllSockets(),"chat message",msgObj);
                 }
             });
             so_arr.push(socketsArr[so]);
@@ -106,12 +108,9 @@ UC_GameController.prototype = {
             //发送关键词
             self.sendWords(socketsArr,words);
         });
-
         //将所有玩家socket装入容器备用
-        this.setAllSockets(this.soObjToArr(this.room.socketsArr));
+        // this.setAllSockets(this.soObjToArr(this.getAllSockets()));
         this.socketsArrEnalbed = this.getAllSockets();
-
-
     },
     //获取关键词
     getWords:function (callback) {
@@ -123,10 +122,11 @@ UC_GameController.prototype = {
                 var num = Math.floor(Math.random()*rs_len);
                 var index1;
                 var index2;
+                var index_num = 5;
                 do{
-                    index1 = Math.floor(Math.random()*5);
-                    index2 = Math.floor(Math.random()*5);
-                }while(index1==index2 || index1>=rs_len || index2>=rs_len)
+                    index1 = Math.floor(Math.random()*index_num);
+                    index2 = Math.floor(Math.random()*index_num);
+                }while(index1==index2 || index1>=index_num || index2>=index_num)
                 var str = [rs_data[num]["word"+(index1+1)],rs_data[num]["word"+(index2+1)]];
                 if(typeof callback =="function"){
                     callback.call(self,str);
@@ -142,9 +142,16 @@ UC_GameController.prototype = {
         for(socket in socketsArr){
             //给大家发送消息
             //投票判断权限
-            if(msgType=="vote" && socketsArr[socket].vote){
-                socketsArr[socket].emit(msgType, msg);
-            }else{
+            if(msg && msg.order_type=="vote"){
+                if(socketsArr[socket].alive){
+                    socketsArr[socket].emit(msgType, msg);
+                }
+            }else if(msg && msg.order_type == "sendWords"){
+                if(socketsArr[socket].alive){
+                    socketsArr[socket].emit(msgType, "您的关键词是："+socketsArr[socket].un_words);
+                }
+            }
+            else{
                 socketsArr[socket].emit(msgType, msg);
             }
         }
@@ -207,12 +214,13 @@ UC_GameController.prototype = {
                 this.describeWords(socketsArr);
             }
         }else{
+            console.log(this.getAllSockets());
             this.socketsArrEnalbed = this.getAllSockets();
             this.voteArr.length = 0;
             
             // if(so.alive && so.voteState){
-                this.sendMsg(this.room.socketsArr,'server message',"描述结束，现在进入投票环节。请输入你要投票的号码，然后发送。");
-                this.sendMsg(this.room.socketsArr,"service order",{order_type:"vote",order_code:""});
+                this.sendMsg(this.getAllSockets(),'server message',"描述结束，现在进入投票环节。请输入你要投票的号码，然后发送。");
+                this.sendMsg(this.getAllSockets(),"service order",{order_type:"vote",order_code:""});
             // }
         }
     },
@@ -242,9 +250,9 @@ UC_GameController.prototype = {
         //如果所有人都已经投票，那么进入下一个环节
         if(this.voteArr.length==this.userEnabledNum){
             //执行完毕，进入下一步
-            this.sendMsg(this.room.socketsArr,'server message',"投票结束，正在计算结果。");
-            this.sendMsg(this.room.socketsArr,"round_result","");
-            this.round_result();
+            this.sendMsg(this.getAllSockets(),'server message',"投票结束，正在计算结果。");
+            this.sendMsg(this.getAllSockets(),"round_result","");
+            this.round_result(); 
         }
     },
     //统计回合结果
@@ -258,7 +266,7 @@ UC_GameController.prototype = {
                 arr.push(voteArr[v].number);
             }
         }
-        this.sendMsg(this.room.socketsArr,'server message',"有效的投票为："+arr.toString());
+        this.sendMsg(this.getAllSockets(),'server message',"有效的投票为："+arr.toString());
         var round_rs=this.getRoundRs(arr);
 
         //判断是否有多个并列
@@ -272,11 +280,11 @@ UC_GameController.prototype = {
                 tied = true;
             }
         }
-        this.sendMsg(this.room.socketsArr,'server message',"得票最高的是："+voteName+",票数为："+round_rs[0].count+"票");
+        this.sendMsg(this.getAllSockets(),'server message',"得票最高的是："+voteName+",票数为："+round_rs[0].count+"票");
 
         if(tied){
             //如果有并列票数，本轮投票忽略，继续进入下一轮
-            this.sendMsg(this.room.socketsArr,'server message','由于有票数并列第一，本轮没有人出局，继续下一轮');
+            this.sendMsg(this.getAllSockets(),'server message','由于有票数并列第一，本轮没有人出局，继续下一轮');
             this.theNextTurn();
         }else{
             var so_arr = this.getAllSockets();
@@ -288,20 +296,18 @@ UC_GameController.prototype = {
                     if(so_arr[i].unState){
                         //卧底被找到，游戏结束，平民胜利。
                         this.room.roomState = roomState.Room_GameOver;
-                        this.sendMsg(this.room.socketsArr,'server message','卧底被找到，游戏结束，平民获胜。。');
-                        this.sendMsg(this.room.socketsArr,'server message','卧底被找到，游戏结束，平民获胜。。');
-                        this.sendMsg(this.room.socketsArr,'server message','卧底被找到，游戏结束，平民获胜。。');
+                        this.sendMsg(this.getAllSockets(),'server message','卧底被找到，游戏结束，平民获胜。。');
+                        this.sendMsg(this.getAllSockets(),'server message','卧底被找到，游戏结束，平民获胜。。');
                         isCiviliansWinner = true;
                         this.getAward("civilians");
                         break;
                     }else{
                         //本轮结果提示信息
-                        this.sendMsg(this.room.socketsArr,'server message','No.'+so_arr[i].gameNumber+'被集体投票出局，可惜他并不是卧底，游戏继续。');
-                        this.sendMsg(this.room.socketsArr,'server message','No.'+so_arr[i].gameNumber+'被集体投票出局，可惜他并不是卧底，游戏继续。');
-                        this.sendMsg(this.room.socketsArr,'server message','No.'+so_arr[i].gameNumber+'被集体投票出局，可惜他并不是卧底，游戏继续。');
+                        this.sendMsg(this.getAllSockets(),'server message','No.'+so_arr[i].gameNumber+'被集体投票出局，可惜他并不是卧底。');
+                        this.sendMsg(this.getAllSockets(),'server message','No.'+so_arr[i].gameNumber+'被集体投票出局，可惜他并不是卧底。');
                         so_arr[i].emit('server message','你已被投票出局，当前不能发言和投票，直到游戏结束。');
                         so_arr[i].emit('server message','你已被投票出局，当前不能发言和投票，直到游戏结束。');
-                        so_arr[i].emit('server message','你已被投票出局，当前不能发言和投票，直到游戏结束。');
+
 
                         //如果不是卧底，则阵亡
                         //设置阵亡
@@ -323,22 +329,18 @@ UC_GameController.prototype = {
             if(gameEnalbedUserNumber<3 && !isCiviliansWinner){
                 //卧底没被找到，游戏结束，卧底胜利。
                 this.room.roomState = roomState.Room_GameOver;
-                this.sendMsg(this.room.socketsArr,'server message','卧底没被找到，游戏结束，卧底获胜。。');
-                this.sendMsg(this.room.socketsArr,'server message','卧底没被找到，游戏结束，卧底获胜。。');
-                this.sendMsg(this.room.socketsArr,'server message','卧底没被找到，游戏结束，卧底获胜。。');
+                this.sendMsg(this.getAllSockets(),'server message','卧底没被找到，游戏结束，卧底获胜。。');
+                this.sendMsg(this.getAllSockets(),'server message','卧底没被找到，游戏结束，卧底获胜。。');
                 this.getAward("underCover");
             }
             //如果剩余游戏玩家数量大于3，并且平民没有胜利，则游戏继续。
             else if(gameEnalbedUserNumber>2 && !isCiviliansWinner){
                 //将阵亡人员信息更新后的集合装入容器
                 this.setAllSockets(so_arr);
-
                 //进入下一轮
                 this.theNextTurn();
             }
         }
-
-
     },
     //将socket对象转换成数组集合
     soObjToArr:function (soObj) {
@@ -380,14 +382,13 @@ UC_GameController.prototype = {
                //document.write("出现次数最多的元素是：" + yuansu[i] + "次数为：" + sum[i] + "<br/>");  
                // first += "出现次数最多的元素是：" + yuansu[i] + "次数为：" + sum[i] + "<br/>";  
                rs.push({"vote":yuansu[i],"count":sum[i]});
-           }  
-  
+           }
        }
        return rs;
     },
     //获取奖励 identity:胜利方角色
     getAward:function (identity) {
-        var arr = this.soObjToArr(this.room.socketsArr);
+        var arr = this.soObjToArr(this.getAllSockets());
         for(var i=0;i<arr.length;i++){
             var _userGameData = arr[i].handshake.session.userGameData;
             if(!arr[i].unState){
@@ -414,13 +415,20 @@ UC_GameController.prototype = {
                 }
             }
         }
+        this.gameover();
     },
     // 进入下一轮
     theNextTurn:function () {
         //重置临时容器，并进入下一轮
-        this.socketsArrEnalbed = this.getAllSockets();
+        var s_arr = this.getAllSockets();
+        this.socketsArrEnalbed = [];
+        for(var s in s_arr){
+            if(s_arr[s].alive){
+                this.socketsArrEnalbed.push(s_arr[s]);
+            }
+        }
         //再次发送关键词，以免玩家忘记自己的关键词
-        this.sendWords();
+        this.sendWords(s_arr);
     },
     //游戏结束
     gameover:function () {
@@ -430,9 +438,8 @@ UC_GameController.prototype = {
         this.room.roomState = roomState.Room_Waiting;
         this.room.saveRoom(function () {
             //将客户端开始按钮变为可用
-            self.sendMsg('service order',{order_type:'gameover',order_code:""});
+            self.sendMsg(self.getAllSockets(),'service order',{order_type:'gameover',order_code:""});
         });
-        
     }
 }
 

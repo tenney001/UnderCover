@@ -5,7 +5,6 @@
 var roomState = require('./RoomState');
 var roomType = require('./roomType');
 var UC_GameController = require('./UC_GameController');
-var gameController = new UC_GameController();
 var config = require('../config'),
     db = config.getDB(),
     roomModel = db.get('roomModel');
@@ -110,9 +109,12 @@ Room.prototype = {
                 user.roomId = this.roomId;
             }
             //将当前socket对象装入socket集合。
-            // this.socketsArr.push(socket);
-            socket_Arr[socket.handshake.session.userGameData.nickname] = socket;
-            this.socketsArr = socket_Arr;
+            socket_Arr[socket.handshake.session.user._id] = socket;
+            this.socketsArr.push(socket.handshake.session.user._id);
+
+
+            // socket_Arr[socket.handshake.session.userGameData.nickname] = socket;
+            // this.socketsArr = socket_Arr;
             this.numUser = this.users.length;
             //加入分组
             socket.join(this.socketGroup);
@@ -126,21 +128,28 @@ Room.prototype = {
 
     },
     //退出房间。
-    leaveRoom:function(user,callback){
-
+    leaveRoom:function(socket,callback){
         var self = this;
+        var user = socket.handshake.session.user;
         //todo 房间人员-1，并且删除房间的该人员，该人员的房间ID号需要清空。
         var tempArr  = [];
         for(var i=0;i<self.users.length;i++){
-            if(self.users[i]._id != user._id){
-                tempArr.push(self.users[i]);
+            if(self.users[i]._id == user._id){
+                self.users.splice(i,1);
+                break;
             }
         }
-        self.users = tempArr;
 
         //todo 判断离开房间的是不是房主，如果是，需要变更房主。
         if(self.roomMaster == user._id && self.users.length>0){
             self.roomMaster = self.users[0]._id;
+        }
+
+        for(var i=0;i<self.socketsArr.length;i++){
+            if(self.socketsArr[i] == socket.handshake.session.user._id){
+                self.socketsArr.splice(i,1);
+                break; 
+            }
         }
 
         self.numUser = self.users.length;
@@ -155,6 +164,7 @@ Room.prototype = {
         //变更房间状态，并装载控制器，游戏启动。
         var self = this;
         self.roomState = roomState.Room_GameStart;
+        var gameController = new UC_GameController();
         // self.saveRoom(function () {
         return gameController.start(self);
         // });
