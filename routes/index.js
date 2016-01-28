@@ -19,7 +19,7 @@ router.get('/', function(req, res, next) {
   //      res.end();
   //    }
   //    console.log(data);
-      res.render('index', { title: '谁是卧底-首页',classindex:0});
+      res.render('index', { title: '谁是卧底-首页',classindex:0}); 
   //});
 });
 
