@@ -1,6 +1,6 @@
 "use strict";
 // Change lat long to your location. You can add multiple markers.
-var sites = [['Berg Restaurant', 51.104411, 17.01300, 1]];
+var sites = [['CowinitRestaurant', 51.104411, 17.01300, 1]];
 
 var $ = jQuery.noConflict();
 
